@@ -1,0 +1,58 @@
+/**自定义样式**/
+/**按钮**/
+.query-builder .addFuncBtn,.addFncChild,.submitArgsBtn{
+    width: auto;
+    overflow: visible;
+    display: inline-block;
+    padding: 6px 12px;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.428571429;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+/**函数下拉框**/
+.whichFnc{
+     margin:10px;
+}
+/**添加子函数的按钮**/
+.addFncChild{
+    float: right;
+}
+/**每个函数下拉框外的div**/
+.allFnc{
+    width: 30% !important;
+    position: relative;
+}
+.allFncSucc{
+    margin:5px 20px;
+}
+.fncSuccess{
+    position: relative;
+    margin: 4px 20px;
+    border-radius: 5px;
+    padding: 5px;
+    border: 1px solid #EEE;
+    background: rgba(255, 255, 255, 0.9);
+}
+/**函数父子样式**/
+.fncSuccess:before{
+    width: 10px;
+    height: 30px;
+    border-radius: 0 0 0 4px;
+    content: "";
+    border-left: solid 2px #ccc;
+    border-bottom: solid 2px #ccc;
+    position: absolute;
+    left: -10px;
+    top: -10px;
+}
+.argsInput{
+    margin: 3px 0;
+    width: 50% !important;
+}

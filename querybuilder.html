@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="">
+    <link href="css/query-builder.default.css" rel="stylesheet">
+    <link href="css/tab.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="css/defaultPage.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="css/bootstrap-select.css" rel="stylesheet">  这样式可根据需求而定看加不加-->
+</head>
+<body>
+<!--<div id="builder"></div>-->
+<!--<div id="builder-plugins"></div>-->
+<div id="btn-reset" style=''>重置</div>
+<div id="btn-set" style=''>设置数据</div>
+<div id="btn-get" style=''>获取数据</div>
+<div id='getRulesss' ></div>
+<div id="dialogBtn">弹窗</div>
+
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.3.0/bootbox.min.js"></script>
+<script src="http://querybuilder.js.org/assets/js/docs.min.js"></script>
+
+<!--<script src="js/dialog.js"></script>-->
+<script src="js/dialog-plus.js"></script>
+<script src="js/interact.js"></script>
+<script src="js/main.js"></script>
+<script src="js/defaults.js"></script>
+<script src="js/jqueryQueryBuilder.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/model.js"></script>
+<script src="js/query-builder.standalone.min.js"></script>
+<script src="js/plugins.js"></script>
+<!--<script src="js/bootstrap-select.js"></script>   这样式可根据需求而定看加不加-->
+<!--<script src="js/tab.js"></script> tab页插件-->
+
+<script src="plugins/sortable/plugin.js"></script>
+<script src="plugins/filter-description/plugin.js"></script>
+<script src="plugins/change-filters/plugin.js"></script>
+<script src="plugins/bt-checkbox/plugin.js"></script>
+<script src="plugins/bt-selectpicker/plugin.js"></script>
+<script src="plugins/bt-tooltip-errors/plugin.js"></script>
+<script src="plugins/not-group/plugin.js"></script>
+<script src="plugins/invert/plugin.js"></script>
+<script src="plugins/unique-filter/plugin.js"></script>
+
+<script>
+
+    var clickSubBtnOrNot = false; //是否配置参数
+    var addSucFncArgsOrNot = true; //是否添加了配置好的函数
+    var valFncOrcolFnc = true; //值函数 false是列函数
+
+    var builderDiv = '<div id="builder-plugins"></div><div class="funcSelectDiv"></div><div class="argsTemplate"><button class="submitArgsBtn">确认添加参数</button></div>';
+
+    var fncTemplate = '<ul class="tabbtn" id="move-animate-left">' +
+        '<li class="current"><a href="#">值函数</a></li>' +
+        '<li><a href="#">列函数</a></li>' +
+        '</ul><!--tabbtn end-->' +
+        '<div class="tabcon" id="leftcon">' +
+        '<div class="subbox"> ' +
+            '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option  value="3">333</option></select></div></div><!--tabcon end-->' +
+        '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option value="3">333</option></select></div></div><!--tabcon end-->' +
+
+        '</div><!--tabcon end-->' +
+        '</div>';
+
+    $(document).on('click','#dialogBtn',function(e){
+        var d = dialog({
+            fixed: false,
+            drag: true,
+            title: '提示',
+            width:800,
+            content: builderDiv,
+            okValue: '确定',
+            ok: function () {
+                if($('.argsTemplate')[0].style.display === 'none'){
+                    var result = $('#builder-plugins').queryBuilder('getRules');
+                    if (!$.isEmptyObject(result)) {
+                        console.log(JSON.stringify(result, null, 2));
+                    }
+                }else{
+                    alert('qweqewqe');
+                }
+
+                return false;
+            },
+            cancelValue: '取消',
+            cancel: function () {}
+        });
+
+        d.showModal();
+
+        var rules_plugins = {
+            display_empty_filter: true,
+            conditions: ['AND', 'OR'],
+            rules: []
+        };
+
+        //初始化
+        $('#builder-plugins').queryBuilder({
+            plugins: [
+                'sortable',
+                'filter-description',
+                'unique-filter',
+                'bt-tooltip-errors',
+                // 'bt-selectpicker',
+                'bt-checkbox',
+                'invert',
+                'not-group'
+            ],
+            filters: [
+                {
+                    unique: true,
+                    id: '年龄',
+                    label: '年龄',
+                    type: 'integer',
+                    input: 'select',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        2: '20-30',
+                        3: '30-40',
+                        4: '40-50',
+                        5: '50-60'
+                    },
+                    color: 'primary',
+                    description: 'This filter uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+                },
+                {
+
+                    id: '姓名',
+                    label: '姓名',
+                    type: 'integer',
+                    input: 'select',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        1: '1',
+                        2: '2',
+                        3: '3',
+                        4: '4'
+                    },
+                    color: 'primary',
+                    description: 'This filter uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+                },
+                {
+                    unique: true, //字段唯一
+                    id: '性别',
+                    label: '性别',
+                    type: 'integer',
+                    input: 'radio',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        1: 'Yes',
+                        0: 'No'
+                    },
+                    colors: {
+                        1: 'success',
+                        0: 'danger'
+                    },
+                    description: 'This filter also uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal']
+                }
+            ]
+            // rules: rules_plugins //这个属性不加就不会默认选中
+        });
+
+        $('#builder-plugins').on('getRuleInput.queryBuilder.filter', function(e, rule) {
+            //监听id选择时
+            // if (rule.filter.id == '姓名') 可对id进行判断，看哪些才需要加select
+            //这种方式可以，下面用的也可以
+            // e.value = '<select class="fnFunction form-control" style="position: relative;left: 700px;">' +
+            //     '<option>-请选择-</option>' +
+            //     '<option>列函数</option>' +
+            //     '<option>值函数</option>' +
+            //     '</select> ' + e.value;
+            //     rule.$el.append('<select class="fnFunction form-control" style="position: relative;left: 600px;">' +
+            //         '<option>-请选择-</option>' +
+            //         '<option>列函数</option>' +
+            //         '<option>值函数</option>' +
+            //         '</select> ')
+            $('.addFuncBtn').remove();
+            rule.$el.append('<button class="addFuncBtn">添加函数</button>');
+
+
+        });
+
+        //添加函数下拉
+
+
+        $('#builder-plugins').on('click','.addFuncBtn',function () {
+            $('.rule-container').removeClass('activeRule');
+            //拿到当前的rule
+            $(this).closest('.rule-container').addClass('activeRule');
+            var $rule = $(this).closest('.rule-container'),
+                active_rule = $rule.data('queryBuilderModel');
+            active_rule.data = [];
+            //如果是值函数，则添加到data的第一个数组
+            if(valFncOrcolFnc){
+                active_rule.data[0] = [];//空的值函数数组
+                active_rule.data[1] = [];//空的列函数数组
+            }else{
+
+            }
+
+            $('.funcSelectDiv').append(fncTemplate);
+            //选项卡切换
+            $('.tabbtn').children().on('click',function(){
+
+                $(this).addClass('current');
+                $(this).siblings().removeClass('current');
+                var theTabIndex = $('.tabbtn').children().index($(this));
+                var theDiv = $('.sublist')[theTabIndex];
+                if($(this).find('a').text()==='列函数'){
+                    valFncOrcolFnc = false; //列函数tab
+                }else{
+                    valFncOrcolFnc = true;  //值函数tab
+                }
+
+                $(theDiv).show();
+                $(theDiv).siblings().hide();
+
+            });
+            // $('.tabbtn').children(':last').on('click',function(){
+            //     $(this).addClass('current');
+            //     $(this).siblings().removeClass('current');
+            //     var theDiv = $('.subbox').children(':last');
+            //     theDiv.show();
+            //     theDiv.siblings().hide();
+            // });
+
+        });
+        //点击addRule按钮
+        $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
+            $('.addFuncBtn').remove();
+            $('.funcSelectDiv').children().remove();
+        });
+
+
+        //下拉切换事件监听
+        $('.argsTemplate').hide();
+        $('.funcSelectDiv').on('change','.whichFnc',function (){
+
+            clickSubBtnOrNot = false;
+            //如果参数未添加
+            if(!addSucFncArgsOrNot){
+
+            }
+            //下拉显示配置参数面板
+            $('.argsTemplate').slideDown();
+
+            $(this).addClass('activeFnc');
+            $(this).addClass('thisSelect');
+            $('.argsTemplate').find('.argsInput').remove();
+            var inputStr = '';
+            for(var i=0;i<parseInt($(this)[0].selectedOptions[0].value);i++){
+                inputStr += '<input class="argsInput" type="text" />';
+            }
+            $('.argsTemplate').append(inputStr);
+            // data:{
+            //     {fncType:'',
+            //         name:"",
+            //         argsArr:['12','232','1232']
+            // }
+        });
+        //点击添加参数,该函数添加到队列
+        $('.argsTemplate').on('click','.submitArgsBtn',function (){
+            clickSubBtnOrNot = true;
+            addSucFncArgsOrNot = false; //参数已添加
+            // $(this).closest('.rule-container').addClass('activeRule');
+            var $rule = $('.activeRule'),
+                active_rule = $rule.data('queryBuilderModel');
+
+            var theSelectInidex = $('.whichFnc').index($('.activeFnc'));
+
+
+
+            // if($('.whichFnc').index($('.activeFnc')) !==0){
+            //
+            // }else{
+            //     if($('.activeFnc').hasClass('thisSelect')){
+            //         active_rule.data = [];
+            //     }
+            // }
+
+
+            var fncType = $('.current').find('a').text(),
+                fncName = $('.activeFnc').val();
+                args = [];
+
+                for(var i=0,M=$('.argsInput').length;i<M;i++){
+                    args.push( $('.argsInput')[i].value);
+                }
+            //data下的属性
+            // var theRuleData = active_rule.data;
+            // if(typeof(theRuleData) !== 'undefined'){
+            //     if(theRuleData.length!==0){
+            //         for(var k=0;k<theRuleData.length;k++){
+            //
+            //             if( fncType === theRuleData[k]['fncType'] && fncName === theRuleData[k]['fncName']){
+            //                 theRuleData[k] = [];
+            //                 theRuleData[k]['argsList'] = args;
+            //             }
+            //         }
+            //     }
+            // }else{
+            //     active_rule.data = [];
+            // }
+            var theVlaFnc;
+                //如果是值函数
+            if(valFncOrcolFnc){
+                theVlaFnc = active_rule.data[0];
+            }else{
+                theVlaFnc = active_rule.data[1];
+            }
+            debugger;
+            var fakerObj = {};
+
+            fakerObj['fncType'] = fncType;
+            fakerObj['fncName'] = fncName;
+            fakerObj['argsList'] = args;
+
+            theVlaFnc.push(fakerObj);
+            // active_rule.data[theSelectInidex]['fncType'] = fncType;
+            // active_rule.data[theSelectInidex]['fncName'] = fncName;
+            // active_rule.data[theSelectInidex]['argsList'] = args;
+            // var fakerObj = {};
+            // fakerObj['fncType'] = fncType;
+            // fakerObj['fncName'] = fncName;
+            // fakerObj['argsList'] = args;
+            // active_rule.data.push(fakerObj)
+            // console.log(active_rule);
+            $('.activeFnc').removeClass('thisSelect').removeClass('activeFnc')
+            $('.argsTemplate').slideUp();
+
+            // var fncName = $('.whichFnc').val();
+            var theFncDiv='<div class="allFncSucc"><div class="fncSuccess ">'+fncName+'</div></div>';
+            //如果是值函数
+            if(valFncOrcolFnc) {
+                //插入第一个面板
+                $('.allFnc').parent(':first').append(theFncDiv);
+            }else{
+                //如果不是插入第二个面板
+                $('.allFnc').parent(':last').append(theFncDiv);
+            }
+
+
+        });
+    });
+
+    // var rules_plugins = {
+    //     // condition: 'AND',
+    //     // condition: 'OR',
+    //     display_empty_filter: true,
+    //     conditions: ['AND', 'OR'],
+    //     rules: [ ]
+    // };
+    //
+    // $('#builder-plugins').queryBuilder({
+    //     plugins: [
+    //         'sortable',
+    //         'filter-description',
+    //         'unique-filter',
+    //         'bt-tooltip-errors',
+    //         // 'bt-selectpicker',
+    //         'bt-checkbox',
+    //         'invert',
+    //         'not-group'
+    //     ],
+    //     filters: [
+    //         {
+    //             unique: true,
+    //             id: '年龄',
+    //             label: '年龄',
+    //             type: 'integer',
+    //             input: 'select',
+    //             data:{
+    //                 argsList:{}
+    //             },
+    //             values: {
+    //                 2: '20-30',
+    //                 3: '30-40',
+    //                 4: '40-50',
+    //                 5: '50-60'
+    //             },
+    //             color: 'primary',
+    //             description: 'This filter uses Awesome Bootstrap Checkboxes',
+    //             operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+    //         },
+    //         {
+    //
+    //             id: '姓名',
+    //             label: '姓名',
+    //             type: 'integer',
+    //             input: 'select',
+    //             data:{
+    //                 argsList:{}
+    //               },
+    //             values: {
+    //                 1: '1',
+    //                 2: '2',
+    //                 3: '3',
+    //                 4: '4'
+    //             },
+    //             color: 'primary',
+    //             description: 'This filter uses Awesome Bootstrap Checkboxes',
+    //             operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+    //         },
+    //         {
+    //             unique: true, //字段唯一
+    //             id: '性别',
+    //             label: '性别',
+    //             type: 'integer',
+    //             input: 'radio',
+    //             data:{
+    //                 argsList:{}
+    //             },
+    //             values: {
+    //                 1: 'Yes',
+    //                 0: 'No'
+    //             },
+    //             colors: {
+    //                 1: 'success',
+    //                 0: 'danger'
+    //             },
+    //             description: 'This filter also uses Awesome Bootstrap Checkboxes',
+    //             operators: ['equal']
+    //         }
+    //     ]
+    //     // rules: rules_plugins //这个属性不加就不会默认选中
+    // });
+
+
+
+
+
+
+    // $('#builder-plugins').on('afterUpdateRuleFilter.queryBuilder afterUpdateRuleOperator.queryBuilder', function(rule) {
+    //     //监听下拉框值改变时
+    //        // debugger;
+    //         // if (rule.filter.id == 'name' ) {
+    //             console.log(1);
+    //         // && rule.operator.type == 'something'
+    //             // var $input = rule.$el.find($.fn.queryBuilder.constructor.selectors.rule_value);
+    //             // ensure cleanup of previous plugin applied
+    //             // apply new plugin
+    //         // }
+    //     }
+    // );
+    $('#builder-plugins').on('change','.fnFunction',function(e,rule) {
+        //监听函数类型的选择
+        var $rule = $(this).closest('.rule-container');
+        var active_rule = $rule.data('queryBuilderModel');
+
+        active_rule.$el.find('.indexInput').remove();
+
+        if(active_rule.$el.find('.fncDetail').length<1) {
+            active_rule.$el.append('<select class="fncDetail form-control" style="position: relative;left: 600px;">' +
+                '<option>-请选择-</option>' +
+                '<option value="3">函数1</option>' +
+                '<option value="2">函数2</option>' +
+                '</select> ');
+        }
+        // var id = $(this).parent().parent().find('.form-control')[0].selectedOptions[0].value,
+        //     ruleF = $('#builder-plugins').queryBuilder('getFilterById', id);
+        // var s = 'fn'+$('.fnFunction').index($(this));
+        var fnc = active_rule.$el.find('.fnFunction').val();
+        var fnDetail = active_rule.$el.find('.fncDetail').val();
+        active_rule.data = {};
+        active_rule.data.argsList = {};
+        // active_rule.filter.data[fnc] = '';
+        // if(fnDetail){
+        //     active_rule.filter.data[fnc] = fnDetail;
+        // }
+
+        debugger;
+        // var $rule = $(this).closest('.rule-container');
+        // active_rule = $rule.data('queryBuilderModel');
+        // dialog.open();
+    });
+
+    //具体函数选择事件
+    $('#builder-plugins').on('change','.fncDetail',function(e,rule) {
+        //监听具体选择哪个函数
+        var $rule = $(this).closest('.rule-container');
+        var active_rule = $rule.data('queryBuilderModel');
+        //切换的时候要把之前的input的输入框删除，重新push
+        active_rule.$el.find('.indexInput').remove();
+
+        var theInputNeedAdd = '';
+        // for(var i=0;i<parseInt(active_rule.$el.find('.fncDetail').val());i++){
+            theInputNeedAdd += '<input class= "indexInput form-control" style="width:50px;" type="text" />'
+        // }
+        active_rule.$el.append(theInputNeedAdd);
+
+        // if(active_rule.$el.find('.fncDetail').length<1) {
+        //     active_rule.$el.append('<select class="fncDetail form-control" style="position: relative;left: 600px;">' +
+        //         '<option>-请选择-</option>' +
+        //         '<option value="3">函数1</option>' +
+        //         '<option value="2">函数2</option>' +
+        //         '</select> ');
+        // }
+
+        // var id = $(this).parent().parent().find('.form-control')[0].selectedOptions[0].value,
+        //     ruleF = $('#builder-plugins').queryBuilder('getFilterById', id);
+        // var s = 'fn'+$('.fnFunction').index($(this));
+        var fnc = active_rule.$el.find('.fnFunction').val();
+        var fnDetail = active_rule.$el.find('.fncDetail')[0].selectedOptions[0].innerHTML;
+
+        //data下的属性
+        active_rule.data['fncType'] = fnc;
+        active_rule.data['fncName'] = fnDetail;
+        active_rule.data.argsList = {};
+        debugger;
+        // var $rule = $(this).closest('.rule-container');
+        // active_rule = $rule.data('queryBuilderModel');
+    });
+
+
+
+    $('#builder-plugins').on('blur','.indexInput',function(e,rule) {
+        //监听具体选择哪个函数
+        var $rule = $(this).closest('.rule-container');
+        var active_rule = $rule.data('queryBuilderModel');
+        console.log(active_rule)
+
+
+        var args = $(this).val();
+        var thisIndex = '参数'+ $('.indexInput').index($(this));
+        var fnDetail = active_rule.$el.find('.fncDetail')[0].selectedOptions[0].innerHTML;
+        console.log(active_rule.filter.operator);
+        //data下的argsList参数多少个
+        active_rule.data.argsList[thisIndex] = args;
+        // var $rule = $(this).closest('.rule-container');
+        // active_rule = $rule.data('queryBuilderModel');
+    });
+
+    $('#builder-plugins').on('beforeDeleteRule.queryBuilder', function(e, rule) {
+        //监听删除
+
+       // for(var key in rule.filter.data){
+       //     if(key === 'fn'+rule.id.split('_')[rule.id.split('_').length-1]){
+       //         debugger;
+       //         rule.filter.data[key] = '';
+       //     }
+       // }
+        // var ssf = rule.$el.find('.rule-filter-container select')[0].selectize;
+        // var ssp = rule.$el.find('.rule-operator-container select')[0].selectize;
+        // ssf.destroy();
+        // ssp.destroy();
+    });
+
+
+    $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
+        debugger;
+    });
+
+    $('#builder-plugins').on('afterCreateRuleInput.queryBuilder', function(e, rule) {
+        debugger;
+    });
+
+    // add rule button
+    // this.$el.on('click.queryBuilder', Selectors.add_rule, function() {
+    //     var $group = $(this).closest(Selectors.group_container);
+    //     self.addRule(self.getModel($group));
+    // });
+
+    //addRule
+    // $('#builder-plugins').on('click', '[data-add=rule]', function(e) {
+    //     var rule =  $('#builder-plugins').queryBuilder('getModel', $(e.target).closest('.rule-container'));
+    //     // $builder.queryBuilder('addRule', rule.parent);
+    //     debugger;
+    //     var newRule = $('#builder-plugins').queryBuilder('addRule', rule.parent);
+    //     newRule.filter = rule.filter;
+    //     newRule.operator = rule.operator;
+    //     newRule.value = rule.value;
+    // });
+
+    // var newRule = $builder.queryBuilder('addRule', rule.parent);
+    // newRule.filter = rule.filter;
+    // newRule.operator = rule.operator;
+    // newRule.value = rule.value;
+
+    //添加filter,自动的
+    // $('#builder-plugins').queryBuilder('addFilter', {
+    //     id: 'namew',
+    //     label: 'Name',
+    //     type: 'string'
+    // });
+
+    $('#btn-reset').on('click', function() {
+        // var $b = $('#builder-plugins');
+        //
+        // // get the root group
+        // var root = $b.queryBuilder('getModel');
+        //
+        // // create an empty group
+        // var group = $b.queryBuilder('addGroup', root, false);
+        //
+        // // create a rule
+        // var rule = $b.queryBuilder('addRule', group);
+        //
+        // debugger;
+        // // populate the rule
+        // rule.filter = $b.queryBuilder('getFilterById', 'name');
+        // rule.operator = $b.queryBuilder('getOperatorByType', 'equal');
+        // rule.value = 'Fooasdasd';
+
+        $('#builder-plugins').queryBuilder('reset');
+    });
+
+    $('#btn-set').on('click', function() {
+
+
+
+        $('#builder-plugins').queryBuilder('setRules', rules_plugins);
+    });
+
+    $('#btn-get').on('click', function() {
+
+
+
+        var result = $('#builder-plugins').queryBuilder('getRules');
+        debugger;
+        if (!$.isEmptyObject(result)) {
+            console.log(JSON.stringify(result, null, 2));
+        }
+        // $('.selectFunction')
+        // $('.rule-container').each(function(index,item){
+        //     if($(item).find('.form-control')[0].selectedOptions[0].value === theLastResult.rules[0].id){
+        //         theLastResult.rules[0].fn = $(item).find('.selectFunction')[0].selectedOptions[0].value
+        //     }
+        //
+        // });
+        //console.log(theLastResult);
+    });
+
+
+
+
+    // var theSelect = '<select class="selectFunction"><option>111</option><option>222</option><option>333</option><option>111</option></select>';
+    // $('.rule-container').append(theSelect);
+
+    // $('.btn-success').on('click',function(){
+    //     var theSelect = '<select class="selectFunction"><option>111</option><option>222</option><option>333</option><option>111</option></select>';
+    //     $('.rule-container').each(function(index,item){
+    //         if($(item).find('.selectFunction').length>0){
+    //
+    //         }else{
+    //             $(item).append(theSelect);
+    //         }
+    //     })
+    // });
+</script>
+
+</body>
+</html>

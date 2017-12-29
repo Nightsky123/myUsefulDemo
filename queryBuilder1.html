@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <link href="">
+    <link href="css/query-builder.default.css" rel="stylesheet">
+    <link href="css/tab.css" rel="stylesheet">
+    <link href="css/custom.css" rel="stylesheet">
+    <link href="css/defaultPage.css" rel="stylesheet">
+    <link href="css/bootstrap.min.css" rel="stylesheet">
+    <!--<link href="css/bootstrap-select.css" rel="stylesheet">  这样式可根据需求而定看加不加-->
+</head>
+<body>
+<!--<div id="builder"></div>-->
+<!--<div id="builder-plugins"></div>-->
+<div id="btn-reset" style=''>重置</div>
+<div id="btn-set" style=''>设置数据</div>
+<div id="btn-get" style=''>获取数据</div>
+<div id='getRulesss' ></div>
+<div id="dialogBtn">弹窗</div>
+
+<script src="js/jquery-2.1.1.min.js"></script>
+<script src="https://netdna.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootbox.js/4.3.0/bootbox.min.js"></script>
+<script src="http://querybuilder.js.org/assets/js/docs.min.js"></script>
+
+<!--<script src="js/dialog.js"></script>-->
+<script src="js/dialog-plus.js"></script>
+<script src="js/interact.js"></script>
+<script src="js/main.js"></script>
+<script src="js/defaults.js"></script>
+<script src="js/jqueryQueryBuilder.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/model.js"></script>
+<script src="js/query-builder.standalone.min.js"></script>
+<script src="js/plugins.js"></script>
+<!--<script src="js/bootstrap-select.js"></script>   这样式可根据需求而定看加不加-->
+<!--<script src="js/tab.js"></script> tab页插件-->
+
+<script src="plugins/sortable/plugin.js"></script>
+<script src="plugins/filter-description/plugin.js"></script>
+<script src="plugins/change-filters/plugin.js"></script>
+<script src="plugins/bt-checkbox/plugin.js"></script>
+<script src="plugins/bt-selectpicker/plugin.js"></script>
+<script src="plugins/bt-tooltip-errors/plugin.js"></script>
+<script src="plugins/not-group/plugin.js"></script>
+<script src="plugins/invert/plugin.js"></script>
+<script src="plugins/unique-filter/plugin.js"></script>
+
+<script>
+
+    var clickSubBtnOrNot = false; //是否配置参数
+    var addSucFncArgsOrNot = true; //是否添加了配置好的函数
+
+
+    var builderDiv =
+        '<div id="builder-plugins"></div>' +
+        '<div class="funcSelectDiv"></div>' +
+        '<div class="argsTemplate"><button class="submitArgsBtn">添加参数</button></div>';
+
+    var fncTemplate = '<ul class="tabbtn" id="move-animate-left">' +
+        '<li class="current"><a href="#">值函数</a></li>' +
+        '<li><a href="#">列函数</a></li>' +
+        '</ul><!--tabbtn end-->' +
+        '<div class="tabcon" id="leftcon">' +
+        '<div class="subbox"> ' +
+        '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option  value="3">333</option></select></div></div><!--tabcon end-->' +
+        '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option value="3">333</option></select></div></div><!--tabcon end-->' +
+        '</div><!--tabcon end-->' +
+        '</div>';
+
+    $(document).on('click','#dialogBtn',function(e){
+        var d = dialog({
+            fixed: false,
+            drag: true,
+            title: '提示',
+            width:800,
+            content: builderDiv,
+            okValue: '确定',
+            ok: function () {
+                if($('.argsTemplate')[0].style.display === 'none'){
+                    var result = $('#builder-plugins').queryBuilder('getRules');
+                    if (!$.isEmptyObject(result)) {
+                        console.log(JSON.stringify(result, null, 2));
+                    }
+                }else{
+                    alert('qweqewqe');
+                }
+
+                return false;
+            },
+            cancelValue: '取消',
+            cancel: function () {}
+        });
+
+        d.showModal();
+
+        var rules_plugins = {
+            display_empty_filter: true,
+            conditions: ['AND', 'OR'],
+            rules: []
+        };
+
+        //初始化
+        $('#builder-plugins').queryBuilder({
+            plugins: [
+                'sortable',
+                'filter-description',
+                'unique-filter',
+                'bt-tooltip-errors',
+                // 'bt-selectpicker',
+                'bt-checkbox',
+                'invert',
+                'not-group'
+            ],
+            filters: [
+                {
+                    // unique: true,
+                    id: '年龄',
+                    label: '年龄',
+                    type: 'integer',
+                    input: 'select',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        2: '20-30',
+                        3: '30-40',
+                        4: '40-50',
+                        5: '50-60'
+                    },
+                    color: 'primary',
+                    description: 'This filter uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+                },
+                {
+
+                    id: '姓名',
+                    label: '姓名',
+                    type: 'integer',
+                    input: 'select',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        1: '1',
+                        2: '2',
+                        3: '3',
+                        4: '4'
+                    },
+                    color: 'primary',
+                    description: 'This filter uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
+                },
+                {
+                    // unique: true, //字段唯一
+                    id: '性别',
+                    label: '性别',
+                    type: 'integer',
+                    input: 'radio',
+                    data:{
+                        argsList:{}
+                    },
+                    values: {
+                        1: 'Yes',
+                        0: 'No'
+                    },
+                    colors: {
+                        1: 'success',
+                        0: 'danger'
+                    },
+                    description: 'This filter also uses Awesome Bootstrap Checkboxes',
+                    operators: ['equal']
+                }
+            ]
+            // rules: rules_plugins //这个属性不加就不会默认选中
+        });
+
+        $('#builder-plugins').on('getRuleInput.queryBuilder.filter', function(e, rule) {
+            $('.addFuncBtn').remove();
+            rule.$el.append('<button class="addFuncBtn">添加函数</button>');
+        });
+        //添加函数下拉
+
+        $('#builder-plugins').on('click','.addFuncBtn',function () {
+
+            //当这一列点击添加函数后，其他列的activeRule Class要去除
+            $('.rule-container').removeClass('activeRule');
+            //拿到当前的rule，并添加个class，后面好拿到这一数据
+            $(this).closest('.rule-container').addClass('activeRule');
+            var $rule = $(this).closest('.rule-container'),
+                active_rule = $rule.data('queryBuilderModel');
+
+            //当已经配置好函数后，再在这一行点击添加函数，则清空之前配置好的函数和参数
+            if($('.tabbtn').length>=1){
+                $('.whichFnc')[0].selectedIndex = 0; //值函数选择置回 -请选择-
+                $('.whichFnc')[1].selectedIndex = 0; //列函数选择置回 -请选择-
+                $('.allFncSucc').remove(); //删除配置好的dom
+                active_rule.data = [];
+                active_rule.data[0] = [];//空的值函数数组
+                active_rule.data[1] = [];//空的列函数数组
+                return false;
+            }
+
+            //点击添加函数，就首先要把他下面的data属性置空，给这一列加个data属性，是数组
+            active_rule.data = [];
+            //如果是值函数，则添加到data的第一个数组
+                active_rule.data[0] = [];//空的值函数数组
+                active_rule.data[1] = [];//空的列函数数组
+
+            //在div中插入select下拉
+            $('.funcSelectDiv').append(fncTemplate);
+
+            //选项卡切换效果
+            $('.tabbtn').children().on('click',function(){
+                var theTarget = $(this);
+                theTarget.addClass('current');
+                theTarget.siblings().removeClass('current');
+                var theTabIndex = $('.tabbtn').children().index(theTarget),
+                    theDiv = $('.sublist')[theTabIndex];
+                if(theTarget.find('a').text()==='列函数'){
+                    $('.whichFnc')[1].selectedIndex = 0; //列函数选择置回 -请选择-
+                }else{
+                    $('.whichFnc')[0].selectedIndex = 0; //值函数选择置回 -请选择-
+
+                }
+                $(theDiv).show();
+                $(theDiv).siblings().hide();
+                $('.argsTemplate').hide();
+            });
+        });
+        //点击addRule按钮,要去掉所有行都存在的添加函数按钮，不然就乱套了
+        $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
+            $('.addFuncBtn').remove();
+            $('.funcSelectDiv').children().remove();
+        });
+
+
+        //下拉切换事件监听
+        $('.argsTemplate').hide();
+        $('.funcSelectDiv').on('change','.whichFnc',function (){
+            var thisTarget = $(this),
+                inputStr = '';
+            //切换函数下拉，就没有确认参数
+            clickSubBtnOrNot = false;
+
+            //下拉显示配置参数面板
+            $('.argsTemplate').slideDown();
+
+            thisTarget.addClass('activeFnc').addClass('thisSelect');
+            //切换后就要把之前在插入的input框去掉，重新插入
+            $('.argsTemplate').find('.argsInput').remove();
+
+            for(var i=0;i<parseInt(thisTarget[0].selectedOptions[0].value);i++){
+                inputStr += '<input class="argsInput form-control" type="text" />';
+            }
+            $('.submitArgsBtn').before(inputStr);
+
+        });
+        //点击添加参数,该函数添加到队列
+        $('.argsTemplate').on('click','.submitArgsBtn',function (){
+            clickSubBtnOrNot = true;
+            addSucFncArgsOrNot = false; //参数已添加
+
+            var $rule = $('.activeRule'),
+                active_rule = $rule.data('queryBuilderModel'), //当前数据
+                theSelectInidex = $('.whichFnc').index($('.activeFnc')),//下拉的index
+                fncType = $('.current').find('a').text(), //函数类型
+                fncName = $('.activeFnc').val(),//函数名
+                args = []; //装参数的空数组
+
+
+            for(var i=0,M=$('.argsInput').length;i<M;i++){
+                args.push( $('.argsInput')[i].value);
+            }
+
+            var theVlaFnc;
+            //如果是值函数
+            var theTabText = $('.tabbtn').find('.current a').text();
+            if( theTabText === '值函数'){
+                theVlaFnc = active_rule.data[0];
+            }else{
+                theVlaFnc = active_rule.data[1];
+            }
+            //函数和其参数一起放到一个对象下
+            var fakerObj = {};
+
+            fakerObj['fncType'] = fncType;
+            fakerObj['fncName'] = fncName;
+            fakerObj['argsList'] = args;
+
+            theVlaFnc.push(fakerObj);
+
+            $('.activeFnc').removeClass('thisSelect').removeClass('activeFnc');
+            $('.argsTemplate').slideUp();
+
+            var theFncDiv='<div class="allFncSucc"><div class="fncSuccess ">'+fncName+'</div></div>';
+            //如果是值函数
+            if(theTabText === '值函数') {
+                //插入第一个面板
+                $('.allFnc').parent(':first').append(theFncDiv);
+            }else{
+                //如果不是插入第二个面板
+                $('.allFnc').parent(':last').append(theFncDiv);
+            }
+        });
+    });
+
+
+
+    $('#btn-reset').on('click', function() {
+        $('#builder-plugins').queryBuilder('reset');
+    });
+
+    $('#btn-set').on('click', function() {
+        $('#builder-plugins').queryBuilder('setRules', rules_plugins);
+    });
+
+    $('#btn-get').on('click', function() {
+        var result = $('#builder-plugins').queryBuilder('getRules');
+        if (!$.isEmptyObject(result)) {
+            console.log(JSON.stringify(result, null, 2));
+        }
+    });
+</script>
+
+</body>
+</html>
