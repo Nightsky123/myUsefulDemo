@@ -209,9 +209,7 @@
     });
 
     $('#btn-get').on('click', function() {
-        debugger;
         var result = $('#builder-widgets').queryBuilder('getRules');
-debugger;
         if (!$.isEmptyObject(result)) {
             console.log(JSON.stringify(result, null, 2));
         }
