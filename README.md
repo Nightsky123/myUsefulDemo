@@ -5,11 +5,11 @@ queryBuilder官网的demo比较少，而且api中的介绍也不是很详细，�
 并搞成了个demo供需要的人参考。
 
 
--------------关于样式--------------
+--------------关于样式--------------
 * 可自定义
 
 
----------目前我的demo的效果---------
+----------目前我的demo的效果---------
 * 可在data属性下随意定义自己所需的数据格式、内容
 * 可以监听字段切换事件，点击addRule事件，beforeAddRule、beforeDeleteRule、beforeAddRule、afterCreateRuleInput...
 * 可以在rule行添加自己自定的按钮事件，并可以获取该行的rule数据
