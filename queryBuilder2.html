@@ -111,17 +111,20 @@
         //dialog模板中塞入我们的数据内容
         qbDialogInit:function(){
             var rules_plugins = {
-                display_empty_filter: true,
-                conditions: ['AND', 'OR'],
-                rules: []
+                conditions: 'AND',
+                rules: [{
+                    id:'category',
+                    operator:'equal',
+                    value:1
+                }]
             };
             //dialog初始化
             $('#builder-plugins').queryBuilder({
                 plugins: [
                     'sortable',
-                    'filter-description',
-                    'unique-filter',
-                    'bt-tooltip-errors',
+                    // 'filter-description',
+                    // 'unique-filter',
+                    // 'bt-tooltip-errors',
                     // 'bt-selectpicker',
                     'bt-checkbox',
                     'invert',
@@ -130,64 +133,19 @@
                 filters: [
                     {
                         // unique: true,
-                        id: '年龄',
-                        label: '年龄',
+                        id: 'category',
+                        label: 'category',
                         type: 'integer',
                         input: 'select',
-                        data:{
-                            argsList:{}
-                        },
-                        values: {
-                            2: '20-30',
-                            3: '30-40',
-                            4: '40-50',
-                            5: '50-60'
-                        },
-                        color: 'primary',
-                        description: 'This filter uses Awesome Bootstrap Checkboxes',
-                        operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
-                    },
-                    {
-
-                        id: '姓名',
-                        label: '姓名',
-                        type: 'integer',
-                        input: 'select',
-                        data:{
-                            argsList:{}
-                        },
                         values: {
                             1: '1',
                             2: '2',
                             3: '3',
                             4: '4'
-                        },
-                        color: 'primary',
-                        description: 'This filter uses Awesome Bootstrap Checkboxes',
-                        operators: ['equal', 'not_equal', 'in', 'not_in', 'is_null', 'is_not_null']
-                    },
-                    {
-                        // unique: true, //字段唯一
-                        id: '性别',
-                        label: '性别',
-                        type: 'integer',
-                        input: 'radio',
-                        data:{
-                            argsList:{}
-                        },
-                        values: {
-                            1: 'Yes',
-                            0: 'No'
-                        },
-                        colors: {
-                            1: 'success',
-                            0: 'danger'
-                        },
-                        description: 'This filter also uses Awesome Bootstrap Checkboxes',
-                        operators: ['equal']
+                        }
                     }
-                ]
-                // rules: rules_plugins //这个属性不加就不会默认选中
+                ],
+                 rules: rules_plugins //这个属性不加就不会默认选中
             });
             //绑定弹窗上的一系列操作
             queryBuilder.bindDialogEvents();
@@ -196,20 +154,31 @@
             var self = this;
 
             //字段选择事件
-            $('#builder-plugins').on('getRuleInput.queryBuilder.filter', function(e, rule) {
-                self.chooseDataName(e,rule);
+            // $('#builder-plugins').on('getRuleInput.queryBuilder.filter', function(e, rule) {
+            //     self.chooseDataName(e,rule);
+            // });
+            //
+            // //点击添加函数按钮事件
+            // $('#builder-plugins').on('click','.addFuncBtn',function () {
+            //     var theTarget = $(this);
+            //     self.addFuncBtnEvent(theTarget);
+            // });
+
+            //默认选中，组件会绑定rule.data
+            $('#builder-plugins').on('afterCreateRuleFilters.queryBuilder', function(e, rule) {
+                self.defaultSelect(e,rule);
             });
 
-            //点击添加函数按钮事件
-            $('#builder-plugins').on('click','.addFuncBtn',function () {
-                var theTarget = $(this);
-                self.addFuncBtnEvent(theTarget);
+            //点击addRule按钮,要去掉所有行都存在的添加函数按钮，不然就乱套了
+            $('#builder-plugins').on('afterAddRule.queryBuilder', function(e, rule) {
+                // $('.addFuncBtn').remove();
+                // $('.funcSelectDiv').children().remove();
             });
 
             //点击addRule按钮,要去掉所有行都存在的添加函数按钮，不然就乱套了
             $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
-                $('.addFuncBtn').remove();
-                $('.funcSelectDiv').children().remove();
+                // $('.addFuncBtn').remove();
+                // $('.funcSelectDiv').children().remove();
             });
 
             //下拉切换事件监听
@@ -224,6 +193,11 @@
                 self.addArgsToCol();
             });
         },
+        defaultSelect:function (e,rule) {
+           var self = this;
+           rule.filter = $('#queryBuilder').queryBuilder('getFilterById','category');
+           rule.value = 1;
+           },
         chooseDataName:function(e,rule){
             $('.addFuncBtn').remove();
             rule.$el.append('<button class="addFuncBtn">添加函数</button>');
