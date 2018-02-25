@@ -6,12 +6,12 @@ queryBuilder官网的demo比较少，而且api中的介绍也不是很详细，�
 
 
 --------------关于样式--------------
-* 可自定义
+* 可自定义，具体参考css文件夹下的样式代码
 
 
 ----------目前我的demo的效果---------
 * 可在data属性下随意定义自己所需的数据格式、内容
-* 可以监听字段切换事件，点击addRule事件，beforeAddRule、beforeDeleteRule、beforeAddRule、afterCreateRuleInput...
+* 可以监听字段切换事件，点击addRule事件，afterCreateRuleFilters、beforeDeleteRule、beforeAddRule、afterAddRule、afterCreateRuleInput...
 * 可以在rule行添加自己自定的按钮事件，并可以获取该行的rule数据
 * 任何一个输入框的数据发生变化时，都要实时更新active_rule.data(这个data是你自己定义的)下对应的属性，以便你在通过插件的方法导出数据时的正确
 * add_rule 和 add_group 的英文可以通过 如：lang:{add_rule:'中文'} 更改
