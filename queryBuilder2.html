@@ -51,15 +51,11 @@
 
 <script>
     $(document).on('click','#dialogBtn',function(e){
-        //拿到函数及参数的数据，然后走下面这方法
         queryBuilder.getfncTemplate();
     });
     var queryBuilder = {
-       //配置函数以及参数的两个div容器
         builderDiv:'<div id="builder-plugins"></div>',
-        //函数切换容器
         getfncTemplate:function(data){
-        
             queryBuilder.qbDialog();
         },
         dialogSubmitBtn:function(){
@@ -69,7 +65,6 @@
             }
             return false;
         },
-        //dialog模板
         qbDialog:function(){
             var self = this;
             var d = dialog({
@@ -80,18 +75,14 @@
                 content: queryBuilder.builderDiv,
                 okValue: '确定',
                 ok: function () {
-                    //点击确按钮,将前台数据发往后台,点击确定后要做校验的
                     self.dialogSubmitBtn()
-
                 },
                 cancelValue: '取消',
                 cancel: function () {}
             });
             d.showModal();
-
             queryBuilder.qbDialogInit();
         },
-        //dialog模板中塞入我们的数据内容
         qbDialogInit:function(){
             var rules_plugins = {
                 conditions: 'AND',
@@ -111,7 +102,6 @@
                 ],
                 filters: [
                     {
-                        // unique: true,
                         id: 'category',
                         label: 'category',
                         type: 'integer',
@@ -124,30 +114,21 @@
                         }
                     }
                 ],
-                 rules: rules_plugins //这个属性不加就不会默认选中
+                rules: rules_plugins
             });
             $('.btn-danger').click();
-            //绑定弹窗上的一系列操作
             queryBuilder.bindDialogEvents();
         },
         bindDialogEvents:function(){
             var self = this;
-
-            //默认选中，组件会绑定rule.data
             $('#builder-plugins').on('afterCreateRuleFilters.queryBuilder', function(e, rule) {
-                self.defaultSelect(e,rule);  //默认选中
+                self.defaultSelect(e,rule);
             });
-
-            //点击addRule按钮
             $('#builder-plugins').on('afterAddRule.queryBuilder', function(e, rule) {
                 self.mockYourSelfDom(e,rule);
             });
-
-            //点击addRule按钮之前
-            $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
-                
+            $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) 
             });
-            //点击addRule按钮之前
             $('#builder-plugins').on('keyup','.privateInput',function(e, rule) {
                  var $rule = $(e.target).closest('.rule-container'),
                 active_rule = $rule.data('queryBuilderModel');
@@ -169,10 +150,8 @@
            rule.filter = $('#builder-plugins').queryBuilder('getFilterById','category');
            rule.value = 1;
            }
-
     };
 
 </script>
-
 </body>
 </html>
