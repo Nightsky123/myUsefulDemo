@@ -25,5 +25,26 @@ queryBuilder官网的demo比较少，而且api中的介绍也不是很详细，�
 * 配置完成后的数据回显思路：配置完成时，首先要将配置好的 basic_rules，也就是你的数据， 存入缓存，然后再将你自己生成的那些dom结构存在当你再次进来时拿到的地方，当你再次进入界面，要重新讲这个之前配置好的rules挂在插件进行初始化，这个初始化是保证你的行数和之前的配置一致，然后在每一行逐行插入你之前存好的dom结构
 
 
+------------导出的数据结构如下----------
+<!--
+{
+  "condition": "AND",
+  "rules": [
+    {
+      "id": "category",
+      "field": "category",
+      "type": "integer",
+      "input": "select",
+      "operator": "equal",
+      "value": "1",
+      "data": {
+        "inputVal": "dfs"
+      }
+    }
+  ],
+  "not": false,
+  "valid": true
+}
+-->
+其中rules是个数组，数组中的每个对象下的data是由个人自定义的数据。属性名和数据都可自己定义。
 
-后面有空我会继续优化下demo
