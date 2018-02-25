@@ -51,13 +51,11 @@
 
 <script>
     $(document).on('click','#dialogBtn',function(e){
-        queryBuilder.getfncTemplate();
+        queryBuilder.qbDialog();
     });
     var queryBuilder = {
         builderDiv:'<div id="builder-plugins"></div>',
-        getfncTemplate:function(data){
-            queryBuilder.qbDialog();
-        },
+    
         dialogSubmitBtn:function(){
             var result = $('#builder-plugins').queryBuilder('getRules');
             if (!$.isEmptyObject(result)) {
@@ -92,7 +90,6 @@
                     value:1
                 }]
             };
-            //dialog初始化
             $('#builder-plugins').queryBuilder({
                 plugins: [
                     'sortable',
@@ -127,10 +124,10 @@
             $('#builder-plugins').on('afterAddRule.queryBuilder', function(e, rule) {
                 self.mockYourSelfDom(e,rule);
             });
-            $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) 
+            $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule){
             });
             $('#builder-plugins').on('keyup','.privateInput',function(e, rule) {
-                 var $rule = $(e.target).closest('.rule-container'),
+                var $rule = $(e.target).closest('.rule-container'),
                 active_rule = $rule.data('queryBuilderModel');
                 active_rule.data = active_rule.data?active_rule.data:{};
                 active_rule.data.inputVal = $(this).val(); //这个value就挂在rules数组中对象的data下了
@@ -138,12 +135,8 @@
 
         },
         mockYourSelfDom:function(e,rule){
-            var thePrivateDomStart = '<div class="privateData">',
-            theInput = "<input class='privateInput form-control' type='text' />",
-            thePrivateDomEnd = '</div>';
-            
-            var theLast = thePrivateDomStart+theInput+thePrivateDomEnd;
-            rule.$el.append(theLast);
+            var thePrivateDomStart = '<div class="privateData"><input class="privateInput form-control" type="text" /></div>';
+            rule.$el.append(thePrivateDomStart);
         },
         defaultSelect:function (e,rule) {
            var self = this;
