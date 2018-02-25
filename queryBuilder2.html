@@ -55,34 +55,17 @@
         queryBuilder.getfncTemplate();
     });
     var queryBuilder = {
-        clickSubBtnOrNot:false,//是否配置参数
-        addSucFncArgsOrNot:true,//是否添加了配置好的函数
-        fncTemplate:null, //调后台接口后，要拿到具体函数名字及每个函数需要的参数个数，然后需要去拼具体函数
-        //配置函数以及参数的两个div容器
-        builderDiv:'<div id="builder-plugins"></div><div class="funcSelectDiv"></div><div class="argsTemplate"><button class="submitArgsBtn">添加参数</button></div>',
+       //配置函数以及参数的两个div容器
+        builderDiv:'<div id="builder-plugins"></div>',
         //函数切换容器
         getfncTemplate:function(data){
-            queryBuilder.fncTemplate =  '<ul class="tabbtn" id="move-animate-left">' +
-            '<li class="current"><a href="#">值函数</a></li>' +
-            '<li><a href="#">列函数</a></li>' +
-            '</ul><!--tabbtn end-->' +
-            '<div class="tabcon" id="leftcon">' +
-            '<div class="subbox"> ' +
-            '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option  value="3">333</option></select></div></div><!--tabcon end-->' +
-            '<div class="sublist"><div class="allFnc"><select class="whichFnc form-control"><option>-请选择-</option><option value="1">111</option><option value="2">222</option><option value="3">333</option></select></div></div><!--tabcon end-->' +
-            '</div><!--tabcon end-->' +
-            '</div>';
+        
             queryBuilder.qbDialog();
         },
         dialogSubmitBtn:function(){
-
-            if($('.argsTemplate')[0].style.display === 'none'){
-                var result = $('#builder-plugins').queryBuilder('getRules');
-                if (!$.isEmptyObject(result)) {
-                    console.log(JSON.stringify(result, null, 2));
-                }
-            }else{
-                alert('qweqewqe');
+            var result = $('#builder-plugins').queryBuilder('getRules');
+            if (!$.isEmptyObject(result)) {
+                console.log(JSON.stringify(result, null, 2));
             }
             return false;
         },
@@ -122,10 +105,6 @@
             $('#builder-plugins').queryBuilder({
                 plugins: [
                     'sortable',
-                    // 'filter-description',
-                    // 'unique-filter',
-                    // 'bt-tooltip-errors',
-                    // 'bt-selectpicker',
                     'bt-checkbox',
                     'invert',
                     'not-group'
@@ -147,180 +126,49 @@
                 ],
                  rules: rules_plugins //这个属性不加就不会默认选中
             });
+            $('.btn-danger').click();
             //绑定弹窗上的一系列操作
             queryBuilder.bindDialogEvents();
         },
         bindDialogEvents:function(){
             var self = this;
 
-            //字段选择事件
-            // $('#builder-plugins').on('getRuleInput.queryBuilder.filter', function(e, rule) {
-            //     self.chooseDataName(e,rule);
-            // });
-            //
-            // //点击添加函数按钮事件
-            // $('#builder-plugins').on('click','.addFuncBtn',function () {
-            //     var theTarget = $(this);
-            //     self.addFuncBtnEvent(theTarget);
-            // });
-
             //默认选中，组件会绑定rule.data
             $('#builder-plugins').on('afterCreateRuleFilters.queryBuilder', function(e, rule) {
-                self.defaultSelect(e,rule);
+                self.defaultSelect(e,rule);  //默认选中
             });
 
-            //点击addRule按钮,要去掉所有行都存在的添加函数按钮，不然就乱套了
+            //点击addRule按钮
             $('#builder-plugins').on('afterAddRule.queryBuilder', function(e, rule) {
-                // $('.addFuncBtn').remove();
-                // $('.funcSelectDiv').children().remove();
+                self.mockYourSelfDom(e,rule);
             });
 
-            //点击addRule按钮,要去掉所有行都存在的添加函数按钮，不然就乱套了
+            //点击addRule按钮之前
             $('#builder-plugins').on('beforeAddRule.queryBuilder', function(e, rule) {
-                // $('.addFuncBtn').remove();
-                // $('.funcSelectDiv').children().remove();
+                
+            });
+            //点击addRule按钮之前
+            $('#builder-plugins').on('keyup','.privateInput',function(e, rule) {
+                 var $rule = $(e.target).closest('.rule-container'),
+                active_rule = $rule.data('queryBuilderModel');
+                active_rule.data = active_rule.data?active_rule.data:{};
+                active_rule.data.inputVal = $(this).val(); //这个value就挂在rules数组中对象的data下了
             });
 
-            //下拉切换事件监听
-            $('.argsTemplate').hide();
-            $('.funcSelectDiv').on('change','.whichFnc',function (){
-                var theTarget = $(this);
-                self.monitorSelectFnc(theTarget);
-
-            });
-            //点击添加参数,该函数添加到队列
-            $('.argsTemplate').on('click','.submitArgsBtn',function (){
-                self.addArgsToCol();
-            });
+        },
+        mockYourSelfDom:function(e,rule){
+            var thePrivateDomStart = '<div class="privateData">',
+            theInput = "<input class='privateInput form-control' type='text' />",
+            thePrivateDomEnd = '</div>';
+            
+            var theLast = thePrivateDomStart+theInput+thePrivateDomEnd;
+            rule.$el.append(theLast);
         },
         defaultSelect:function (e,rule) {
            var self = this;
-           rule.filter = $('#queryBuilder').queryBuilder('getFilterById','category');
+           rule.filter = $('#builder-plugins').queryBuilder('getFilterById','category');
            rule.value = 1;
-           },
-        chooseDataName:function(e,rule){
-            $('.addFuncBtn').remove();
-            rule.$el.append('<button class="addFuncBtn">添加函数</button>');
-        },
-        //点击添加函数按钮事件
-        addFuncBtnEvent:function(theTarget){
-            //当这一列点击添加函数后，其他列的activeRule Class要去除
-            $('.rule-container').removeClass('activeRule');
-            //拿到当前的rule，并添加个class，后面好拿到这一数据
-            theTarget.closest('.rule-container').addClass('activeRule');
-            var $rule = theTarget.closest('.rule-container'),
-                active_rule = $rule.data('queryBuilderModel');
-
-            //当已经配置好函数后，再在这一行点击添加函数，则清空之前配置好的函数和参数
-            if($('.tabbtn').length>=1){
-                $('.whichFnc')[0].selectedIndex = 0; //值函数选择置回 -请选择-
-                $('.whichFnc')[1].selectedIndex = 0; //列函数选择置回 -请选择-
-                $('.allFncSucc').remove(); //删除配置好的dom
-                active_rule.data = [];
-                active_rule.data[0] = [];//空的值函数数组
-                active_rule.data[1] = [];//空的列函数数组
-                return false;
-            }
-
-            //点击添加函数，就首先要把他下面的data属性置空，给这一列加个data属性，是数组
-            active_rule.data = [];
-            //如果是值函数，则添加到data的第一个数组
-            active_rule.data[0] = [];//空的值函数数组
-            active_rule.data[1] = [];//空的列函数数组
-
-            //在div中插入select下拉
-            $('.funcSelectDiv').append(queryBuilder.fncTemplate);
-
-            this.tabSwitch();
-        },
-        //选项卡切换效果
-        tabSwitch:function(){
-            //选项卡切换效果
-            $('.tabbtn').children().on('click',function(){
-                var theTarget = $(this);
-                theTarget.addClass('current');
-                theTarget.siblings().removeClass('current');
-
-                var theTabIndex = $('.tabbtn').children().index(theTarget),
-                    theDiv = $('.sublist')[theTabIndex];
-
-                if(theTarget.find('a').text()==='列函数'){
-                    $('.whichFnc')[1].selectedIndex = 0; //列函数选择置回 -请选择-
-                }else{
-                    $('.whichFnc')[0].selectedIndex = 0; //值函数选择置回 -请选择-
-
-                }
-
-                $(theDiv).show();
-                $(theDiv).siblings().hide();
-                $('.argsTemplate').hide();
-            });
-        },
-        //监听select切换效果
-        monitorSelectFnc:function(theTarget){
-            var thisTarget = theTarget,
-                inputStr = '';
-            //切换函数下拉，就没有确认参数
-            this.clickSubBtnOrNot = false;
-
-            //下拉显示配置参数面板
-            $('.argsTemplate').slideDown();
-
-            thisTarget.addClass('activeFnc').addClass('thisSelect');
-            //切换后就要把之前在插入的input框去掉，重新插入
-            $('.argsTemplate').find('.argsInput').remove();
-
-            for(var i=0;i<parseInt(thisTarget[0].selectedOptions[0].value);i++){
-                inputStr += '<input class="argsInput form-control" type="text" />';
-            }
-            $('.submitArgsBtn').before(inputStr);
-        },
-        //
-        addArgsToCol:function(){
-            this.clickSubBtnOrNot = true;
-            this.addSucFncArgsOrNot = false; //参数已添加
-
-            var $rule = $('.activeRule'),
-                active_rule = $rule.data('queryBuilderModel'), //当前数据
-                theSelectInidex = $('.whichFnc').index($('.activeFnc')),//下拉的index
-                fncType = $('.current').find('a').text(), //函数类型
-                fncName = $('.activeFnc').val(),//函数名
-                args = []; //装参数的空数组
-
-            for(var i=0,M=$('.argsInput').length;i<M;i++){
-                args.push( $('.argsInput')[i].value);
-            }
-
-            var theVlaFnc;
-            //如果是值函数
-            var theTabText = $('.tabbtn').find('.current a').text();
-            if( theTabText === '值函数'){
-                theVlaFnc = active_rule.data[0];
-            }else{
-                theVlaFnc = active_rule.data[1];
-            }
-            //函数和其参数一起放到一个对象下
-            var fakerObj = {};
-
-            fakerObj['fncType'] = fncType;
-            fakerObj['fncName'] = fncName;
-            fakerObj['argsList'] = args;
-
-            theVlaFnc.push(fakerObj);
-
-            $('.activeFnc').removeClass('thisSelect').removeClass('activeFnc');
-            $('.argsTemplate').slideUp();
-
-            var theFncDiv='<div class="allFncSucc"><div class="fncSuccess ">'+fncName+'</div></div>';
-            //如果是值函数
-            if(theTabText === '值函数') {
-                //插入第一个面板
-                $('.allFnc').parent(':first').append(theFncDiv);
-            }else{
-                //如果不是插入第二个面板
-                $('.allFnc').parent(':last').append(theFncDiv);
-            }
-        }
+           }
 
     };
 
